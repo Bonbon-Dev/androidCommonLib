@@ -2,8 +2,10 @@ package com.bbt.commonlib.operationutil;
 
 
 import android.content.res.Resources;
+import android.graphics.Color;
 
 import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
@@ -44,5 +46,30 @@ public final class ResourceUtils {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    /**
+     * Color-string to color-int.
+     * <p>Supported formats are:</p>
+     *
+     * <ul>
+     * <li><code>#RRGGBB</code></li>
+     * <li><code>#AARRGGBB</code></li>
+     * </ul>
+     *
+     * <p>The following names are also accepted: <code>red</code>, <code>blue</code>,
+     * <code>green</code>, <code>black</code>, <code>white</code>, <code>gray</code>,
+     * <code>cyan</code>, <code>magenta</code>, <code>yellow</code>, <code>lightgray</code>,
+     * <code>darkgray</code>, <code>grey</code>, <code>lightgrey</code>, <code>darkgrey</code>,
+     * <code>aqua</code>, <code>fuchsia</code>, <code>lime</code>, <code>maroon</code>,
+     * <code>navy</code>, <code>olive</code>, <code>purple</code>, <code>silver</code>,
+     * and <code>teal</code>.</p>
+     *
+     * @param colorString The color-string.
+     * @return color-int
+     * @throws IllegalArgumentException The string cannot be parsed.
+     */
+    public static int string2Int(@NonNull String colorString) {
+        return Color.parseColor(colorString);
     }
 }

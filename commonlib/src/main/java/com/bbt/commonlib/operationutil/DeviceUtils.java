@@ -15,13 +15,10 @@ import static android.Manifest.permission.CHANGE_WIFI_STATE;
 import static android.content.Context.WIFI_SERVICE;
 
 /**
- * <pre>
- *     author: Blankj
- *     blog  : http://blankj.com
- *     time  : 2016/8/1
- *     desc  : utils about device
- * </pre>
- */
+  *  @author lixiaonan
+  *  功能描述: 设备信息工具类
+  *  时 间： 2019-11-06 12:27
+  */
 public final class DeviceUtils {
 
     private DeviceUtils() {
@@ -60,18 +57,16 @@ public final class DeviceUtils {
     }
 
     /**
-     * Return the version name of device's system.
-     *
-     * @return the version name of device's system
+     * 获取系统版本号的(字符串的)
+     * @return
      */
     public static String getSDKVersionName() {
         return Build.VERSION.RELEASE;
     }
 
     /**
-     * Return version code of device's system.
-     *
-     * @return version code of device's system
+     * 获取系统版本号(int值的)
+     * @return  eg: 20   21
      */
     public static int getSDKVersionCode() {
         return Build.VERSION.SDK_INT;
