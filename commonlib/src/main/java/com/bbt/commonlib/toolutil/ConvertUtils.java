@@ -269,8 +269,7 @@ public final class ConvertUtils {
     }
 
     /**
-     * Milliseconds to fit time span.
-     *
+     * 毫秒倒计时数转换为倒计时数据
      * @param millis    The milliseconds.
      *                  <p>millis &lt;= 0, return null</p>
      * @param precision The precision of time span.
@@ -286,19 +285,64 @@ public final class ConvertUtils {
      */
     @SuppressLint("DefaultLocale")
     public static String millis2FitTimeSpan(long millis, int precision) {
-        if (millis <= 0 || precision <= 0) return null;
-        StringBuilder sb = new StringBuilder();
         String[] units = {"天", "小时", "分钟", "秒", "毫秒"};
-        int[] unitLen = {86400000, 3600000, 60000, 1000, 1};
-        precision = Math.min(precision, 5);
-        for (int i = 0; i < precision; i++) {
-            if (millis >= unitLen[i]) {
-                long mode = millis / unitLen[i];
-                millis -= mode * unitLen[i];
-                sb.append(mode).append(units[i]);
+        return millis2FitTimeSpan(millis,precision,units);
+    }
+
+    /**
+     * 毫秒倒计时数转换为倒计时数据
+     * @param millis    毫秒数
+     * @param precision  获取到第几位  1 天  2 天, 小时  3 天, 小时, 分钟
+     * @param units     自定义时间文案  eg: {"天", "小时", "分钟", "秒", "毫秒"}
+     * @return
+     */
+    public static String millis2FitTimeSpan(long millis, int precision,String[] units) {
+        try {
+            if (millis <= 0 || precision <= 0) {
+                return "";
             }
+            if(null!=units||precision>units.length){
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            int[] unitLen = {86400000, 3600000, 60000, 1000, 1};
+            precision = Math.min(precision, 5);
+            for (int i = 0; i < precision; i++) {
+                if (millis >= unitLen[i]) {
+                    long mode = millis / unitLen[i];
+                    millis -= mode * unitLen[i];
+                    sb.append(mode).append(units[i]);
+                }
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
         }
-        return sb.toString();
+    }
+    /**
+     * 秒倒计时数转换为倒计时数据  默认时间格式的 {"天", "小时", "分钟", "秒", "毫秒"};
+     * @param seconds    秒数
+     * @param precision  获取到第几位  1 天  2 天, 小时  3 天, 小时, 分钟
+     * @return
+     */
+    @SuppressLint("DefaultLocale")
+    public static String seconds2FitTimeSpan(long seconds, int precision) {
+        long millis=seconds*1000L;
+        String[] units = {"天", "小时", "分钟", "秒", "毫秒"};
+        return millis2FitTimeSpan(millis,precision,units);
+    }
+    /**
+     * 秒倒计时数转换为倒计时数据
+     * @param seconds    秒数
+     * @param precision  获取到第几位  1 天  2 天, 小时  3 天, 小时, 分钟
+     * @param units     自定义时间文案  eg: {"天", "小时", "分钟", "秒", "毫秒"}
+     * @return
+     */
+    @SuppressLint("DefaultLocale")
+    public static String seconds2FitTimeSpan(long seconds, int precision, String[] units) {
+        long millis=seconds*1000L;
+        return millis2FitTimeSpan(millis,precision,units);
     }
 
     /**
