@@ -9,10 +9,10 @@ import com.tencent.mmkv.MMKV;
 import androidx.annotation.NonNull;
 
 /**
-  *  @author lixiaonan
-  *  功能描述: sp存储相关的服务的
-  *  时 间： 2019-11-14 16:37
-  */
+ * @author lixiaonan
+ * 功能描述: sp存储相关的服务的
+ * 时 间： 2019-11-14 16:37
+ */
 public class SpSetUtils {
 
     private static SpSetUtils instance;
@@ -27,18 +27,20 @@ public class SpSetUtils {
     }
 
     /**
-     *  迁移数据相关记录是否迁移完成的
+     * 迁移数据相关记录是否迁移完成的
      */
     private static final String KEY_MIGRATE_DONE = "KEY_MIGRATE_DONE";
     private static boolean migrateDone;
 
     /**
+     * 注意：因为万物和棒棒糖目前都只有一个sp文件 所以先默认一次就可以转移完成的
      * 导入旧的sp的数据如果导入旧的就用旧的文件名作为新的文件名
-     * @param oldSpName
-     * @return
+     *
+     * @param oldSpName 旧的sp文件名
+     * @return  迁移的key的个数
      */
-    public int importFromOldSharedPreferences(@NonNull String oldSpName){
-        this.oldSpName=oldSpName;
+    public int importFromOldSharedPreferences(@NonNull String oldSpName) {
+        this.oldSpName = oldSpName;
         int importSize = 0;
         MMKV mPreferences = MMKV.mmkvWithID(oldSpName, MMKV.MULTI_PROCESS_MODE);
         if (!migrateDone) {
@@ -60,62 +62,80 @@ public class SpSetUtils {
 
     /**
      * 根据文件名字获取MMKV
-     * @return
+     * @return mmkv文件
      */
-    private MMKV getMMkVByFileName(String fileName){
-        if(StringUtil.isNotEmpty(fileName)){
+    private MMKV getMMkVByFileName(String fileName) {
+        if (StringUtil.isNotEmpty(fileName)) {
             return MMKV.mmkvWithID(fileName, MMKV.MULTI_PROCESS_MODE);
-        }else{
-            if(StringUtil.isNotEmpty(oldSpName)){
+        } else {
+            if (StringUtil.isNotEmpty(oldSpName)) {
                 return MMKV.mmkvWithID(oldSpName, MMKV.MULTI_PROCESS_MODE);
-            }else{
-                return MMKV.defaultMMKV(MMKV.MULTI_PROCESS_MODE,null);
+            } else {
+                return MMKV.defaultMMKV(MMKV.MULTI_PROCESS_MODE, null);
             }
         }
     }
 
     /**
-     * 在默认文件中保存布尔值
-     * @param key
-     * @param value
+     * 判断某个key是否存在的
+     * @param key key值
+     * @return 存在true
      */
-    public void putBoolean(@NonNull String key,@NonNull boolean value) {
-       this.putBoolean("",key,value);
+    public boolean containsKey(@NonNull String key) {
+        return this.containsKey("", key);
+    }
+
+    public boolean containsKey(String fileName, @NonNull String key) {
+        MMKV mmkv = getMMkVByFileName(fileName);
+        return mmkv.containsKey(key);
+    }
+
+    /**
+     * 在默认文件中保存布尔值
+     * @param key   key
+     * @param value  value
+     */
+    public void putBoolean(@NonNull String key,boolean value) {
+        this.putBoolean("", key, value);
     }
 
     /**
      * 在指定文件中保存布尔值
-     * @param fileName
-     * @param key
-     * @param value
+     * @param fileName 文件名
+     * @param key    key
+     * @param value  value
      */
-    public void putBoolean(String fileName,@NonNull String key,@NonNull boolean value) {
-       MMKV editor = getMMkVByFileName(fileName);
-       editor.encode(key, value);
+    public void putBoolean(String fileName, @NonNull String key,boolean value) {
+        MMKV editor = getMMkVByFileName(fileName);
+        editor.encode(key, value);
     }
 
     /**
      * 获取布尔值
-     * @param key
+     * @param key  key
      * @return
      */
     public boolean getBoolean(@NonNull String key) {
-      return this.getBoolean("",key,false);
+        return this.getBoolean("", key, false);
     }
+
     public boolean getBoolean(@NonNull String key, boolean defaultValue) {
-      return this.getBoolean("",key,defaultValue);
+        return this.getBoolean("", key, defaultValue);
     }
-    public boolean getBooleanByOtherFile(String fileName,@NonNull String key) {
-      return this.getBoolean(fileName,key,false);
+
+    public boolean getBooleanByOtherFile(String fileName, @NonNull String key) {
+        return this.getBoolean(fileName, key, false);
     }
+
     /**
      * 获取布尔值
-     * @param fileName 文件名
-     * @param key      key值
+     *
+     * @param fileName     文件名
+     * @param key          key值
      * @param defaultValue 默认值
-     * @return
+     * @return 获取到的值
      */
-    public boolean getBoolean(String fileName,@NonNull String key, boolean defaultValue) {
+    public boolean getBoolean(String fileName, @NonNull String key, boolean defaultValue) {
         MMKV editor = getMMkVByFileName(fileName);
         return editor.decodeBool(key, defaultValue);
     }
@@ -123,32 +143,38 @@ public class SpSetUtils {
 
     /**
      * 保存String值的
-     * @param key
-     * @param value
+     *
+     * @param key   key
+     * @param value value
      */
     public void putString(String key, String value) {
-       this.putString("",key,value);
+        this.putString("", key, value);
     }
-    public void putString(String fileName,String key, String value) {
+
+    public void putString(String fileName, String key, String value) {
         MMKV editor = getMMkVByFileName(fileName);
-        editor.encode(key,value);
+        editor.encode(key, value);
     }
 
     /**
      * 获取String值的
-     * @param key
-     * @return
+     *
+     * @param key  key
+     * @return  获取到的string值
      */
     public String getString(@NonNull String key) {
-        return this.getString("",key,"");
+        return this.getString("", key, "");
     }
-    public String getString(@NonNull String key,@NonNull String defaultValue) {
-        return this.getString("",key,defaultValue);
+
+    public String getString(@NonNull String key, @NonNull String defaultValue) {
+        return this.getString("", key, defaultValue);
     }
-    public String getStringByOtherFile(String fileName,@NonNull String key) {
-        return this.getString(fileName,key,"");
+
+    public String getStringByOtherFile(String fileName, @NonNull String key) {
+        return this.getString(fileName, key, "");
     }
-    public String getString(String fileName,String key,@NonNull String defaultValue) {
+
+    public String getString(String fileName, String key, @NonNull String defaultValue) {
         MMKV editor = getMMkVByFileName(fileName);
         return editor.decodeString(key, defaultValue);
     }
@@ -156,64 +182,89 @@ public class SpSetUtils {
 
     /**
      * 保存int值的
-     * @param key
-     * @param value
+     *
+     * @param key   key
+     * @param value value
      */
     public void putInt(String key, int value) {
-       this.putInt("",key,value);
+        this.putInt("", key, value);
     }
-    public void putInt(String fileName,String key, int value) {
+
+    public void putInt(String fileName, String key, int value) {
         MMKV editor = getMMkVByFileName(fileName);
-        editor.encode(key,value);
+        editor.encode(key, value);
     }
 
     /**
      * 获取int值的
-     * @param key
-     * @return
+     *
+     * @param key  key
+     * @return  获取到的int值
      */
     public int getInt(@NonNull String key) {
-        return this.getInt("",key,0);
+        return this.getInt("", key, 0);
     }
-    public int getInt(@NonNull String key,int defaultValue) {
-        return this.getInt("",key,defaultValue);
+
+    public int getInt(@NonNull String key, int defaultValue) {
+        return this.getInt("", key, defaultValue);
     }
-    public int getIntByOtherFile(String fileName,@NonNull String key) {
-        return this.getInt(fileName,key,0);
+
+    public int getIntByOtherFile(String fileName, @NonNull String key) {
+        return this.getInt(fileName, key, 0);
     }
-    public int getInt(String fileName,String key,int defaultValue) {
+
+    public int getInt(String fileName, String key, int defaultValue) {
         MMKV editor = getMMkVByFileName(fileName);
         return editor.decodeInt(key, defaultValue);
     }
+
     /**
      * 保存long值的
-     * @param key
-     * @param value
+     *
+     * @param key   key
+     * @param value value
      */
     public void putLong(String key, long value) {
-       this.putLong("",key,value);
+        this.putLong("", key, value);
     }
-    public void putLong(String fileName,String key, long value) {
+
+    public void putLong(String fileName, String key, long value) {
         MMKV editor = getMMkVByFileName(fileName);
-        editor.encode(key,value);
+        editor.encode(key, value);
     }
 
     /**
      * 获取long值的
-     * @param key
-     * @return
+     *
+     * @param key  key
+     * @return 获取的long值
      */
     public long getLong(@NonNull String key) {
-        return this.getLong("",key,0);
+        return this.getLong("", key, 0);
     }
-    public long getLong(@NonNull String key,long defaultValue) {
-        return this.getLong("",key,defaultValue);
+
+    public long getLong(@NonNull String key, long defaultValue) {
+        return this.getLong("", key, defaultValue);
     }
-    public long getLongByOtherFile(String fileName,@NonNull String key) {
-        return this.getLong(fileName,key,0);
+
+    public long getLongByOtherFile(String fileName, @NonNull String key) {
+        return this.getLong(fileName, key, 0);
     }
-    public long getLong(String fileName,String key,long defaultValue) {
+
+    public long getLong(String fileName, String key, long defaultValue) {
         MMKV editor = getMMkVByFileName(fileName);
         return editor.decodeLong(key, defaultValue);
+    }
+
+    /**
+     * 清除文件中相关的配置的
+     */
+    public void clearFile() {
+        this.clearFile("");
+    }
+
+    public void clearFile(@NonNull String fileName) {
+        MMKV mmkv = getMMkVByFileName(fileName);
+        mmkv.clearAll();
     }
 }
