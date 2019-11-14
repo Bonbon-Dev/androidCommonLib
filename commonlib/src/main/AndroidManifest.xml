@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bbt.commonlib" >
-    <application>
+    <application
+        android:name="com.bbt.commonlib.LibApplication"
+        >
         <provider
             android:name=".operationutil.Utils$FileProvider4UtilCode"
             android:authorities="${applicationId}.utilcode.provider"

@@ -38,7 +38,7 @@ public class StringUtil {
      * @return 不为空为true
      */
     public static boolean isNotEmpty(final CharSequence s) {
-        return !(isNotEmpty(s));
+        return !(isEmpty(s));
     }
 
     /**
