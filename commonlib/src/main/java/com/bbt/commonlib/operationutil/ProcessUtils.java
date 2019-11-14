@@ -24,13 +24,10 @@ import androidx.annotation.RequiresPermission;
 import static android.Manifest.permission.KILL_BACKGROUND_PROCESSES;
 
 /**
- * <pre>
- *     author: Blankj
- *     blog  : http://blankj.com
- *     time  : 2016/10/18
- *     desc  : utils about process
- * </pre>
- */
+  *  @author lixiaonan
+  *  功能描述: 进程相关的工具类
+  *  时 间： 2019-11-08 19:49
+  */
 public final class ProcessUtils {
 
     private ProcessUtils() {

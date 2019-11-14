@@ -1,13 +1,10 @@
 package com.bbt.commonlib.constant;
 
 /**
- * <pre>
- *     author: Blankj
- *     blog  : http://blankj.com
- *     time  : 2017/03/13
- *     desc  : constants of regex
- * </pre>
- */
+  *  @author lixiaonan
+  *  功能描述: 正则相关的常量类
+  *  时 间： 2019-11-08 12:47
+  */
 public final class RegexConstants {
 
     /**

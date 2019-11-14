@@ -2,13 +2,20 @@ package com.bbt.commonlib.operationutil;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import com.bbt.commonlib.toolutil.FileUtils;
+
+import java.io.File;
 import java.util.List;
+
+import androidx.core.content.FileProvider;
 
 /**
  * @author lixiaonan
@@ -131,5 +138,47 @@ public final class AppUtils {
         return -1;
     }
 
+    /**
+     * 安装 App（支持 8.0）
+     * @param filePath
+     */
+    public static void installApp(final String filePath) {
+        installApp(FileUtils.getFileByPath(filePath));
+    }
+    /**
+     * 安装 App（支持 8.0）
+     * @param file
+     */
+    public static void installApp(final File file) {
+        if (!FileUtils.isFileExists(file)) {
+            return;
+        }
+        Utils.getApp().startActivity(getInstallAppIntent(file, true));
+    }
 
+    private static Intent getInstallAppIntent(final File file) {
+        return getInstallAppIntent(file, false);
+    }
+
+    /**
+     * 获取安装app的意图
+     * @param file  文件
+     * @param isNewTask
+     * @return
+     */
+    private static Intent getInstallAppIntent(final File file, final boolean isNewTask) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri data;
+        String type = "application/vnd.android.package-archive";
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            data = Uri.fromFile(file);
+        } else {
+            String authority = Utils.getApp().getPackageName() + ".utilcode.provider";
+            data = FileProvider.getUriForFile(Utils.getApp(), authority, file);
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        Utils.getApp().grantUriPermission(Utils.getApp().getPackageName(), data, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setDataAndType(data, type);
+        return isNewTask ? intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) : intent;
+    }
 }
