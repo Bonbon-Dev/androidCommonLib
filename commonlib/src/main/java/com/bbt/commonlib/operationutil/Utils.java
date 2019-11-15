@@ -141,11 +141,21 @@ public final class Utils {
         return false;
     }
 
+    /**
+     * 子线程中执行任务的
+     * @param task 任务
+     * @param <T>  放回结果类型的
+     * @return 返回结果
+     */
     static <T> Task<T> doAsync(final Task<T> task) {
         UTIL_POOL.execute(task);
         return task;
     }
 
+    /**
+     * 在主线程中执行任务的
+     * @param runnable
+     */
     public static void runOnUiThread(final Runnable runnable) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             runnable.run();
@@ -154,6 +164,11 @@ public final class Utils {
         }
     }
 
+    /**
+     * 在主线程中延迟执行任务的
+     * @param runnable
+     * @param delayMillis
+     */
     public static void runOnUiThreadDelayed(final Runnable runnable, long delayMillis) {
         Utils.UTIL_HANDLER.postDelayed(runnable, delayMillis);
     }
@@ -391,7 +406,9 @@ public final class Utils {
 
         void addOnActivityDestroyedListener(final Activity activity,
                                             final OnActivityDestroyedListener listener) {
-            if (activity == null || listener == null) return;
+            if (activity == null || listener == null) {
+                return;
+            }
             Set<OnActivityDestroyedListener> listeners;
             if (!mDestroyedListenerMap.containsKey(activity)) {
                 listeners = new HashSet<>();
@@ -428,7 +445,9 @@ public final class Utils {
         }
 
         private void postStatus(final boolean isForeground) {
-            if (mStatusListenerMap.isEmpty()) return;
+            if (mStatusListenerMap.isEmpty()) {
+                return;
+            }
             for (OnAppStatusChangedListener onAppStatusChangedListener :
                     mStatusListenerMap.values()) {
                 if (onAppStatusChangedListener == null) return;
@@ -537,7 +556,9 @@ public final class Utils {
             try {
                 final Result t = doInBackground();
 
-                if (state != NEW) return;
+                if (state != NEW) {
+                    return;
+                }
                 state = COMPLETING;
                 UTIL_HANDLER.post(new Runnable() {
                     @Override
@@ -546,7 +567,9 @@ public final class Utils {
                     }
                 });
             } catch (Throwable th) {
-                if (state != NEW) return;
+                if (state != NEW) {
+                    return;
+                }
                 state = EXCEPTIONAL;
             }
         }

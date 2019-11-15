@@ -19,6 +19,5 @@ public class LibApplication extends Application {
             //初始化微信sp架构的
             MMKV.initialize(this);
         }
-
     }
 }
