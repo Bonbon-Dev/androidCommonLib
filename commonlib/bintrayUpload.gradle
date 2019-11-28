@@ -2,7 +2,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 // This is the library version used when deploying the artifact
 //这里是你的版本，当你需要上传新的版本到bintry上时，只需要修改这里的版本即可
-version = "1.0.0"
+version = "1.0.1"
 
 
 //项目的主页
@@ -10,7 +10,7 @@ def siteUrl = 'https://github.com/Bonbon-Dev/androidCommonLib'
 //Git仓库的url
 def gitUrl = 'https://github.com/Bonbon-Dev/androidCommonLib.git'
 // Maven Group ID for the artifact，一般填你唯一的包名
-group = "com.bbt.commonlib"
+group = "com.bbt.common"
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
@@ -76,7 +76,7 @@ bintray {
         publish = true
     }
 }
-//jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误
+////jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误
 javadoc {
     options {
         encoding "UTF-8"
