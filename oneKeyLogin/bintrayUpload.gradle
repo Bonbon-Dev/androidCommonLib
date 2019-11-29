@@ -69,7 +69,7 @@ bintray {
     pkg {
         userOrg ="bbt"//这个地方一定要填，一定要填 ！！（这里需要修改你申请账号是的组织id）
         repo = "bbtCommon"//发布到bintray上的仓库名
-        name = "onekey"  //发布到bintray上的包名
+        name = "onekeylogin"  //发布到bintray上的包名
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]

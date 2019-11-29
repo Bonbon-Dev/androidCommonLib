@@ -9,13 +9,16 @@ buildscript {
         maven { url 'https://dl.bintray.com/bbt/bbtCommon/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        //TODO 这里要注意因为 引用了第三方将aar合并的插件 gradle插件版本暂时不要升级
+        classpath 'com.android.tools.build:gradle:3.4.2'
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         //下面2个都是用来上传的插件
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        //用户将lib里面的aar合并的
+        classpath 'com.cpdroid:fat-aar:1.1.0'
     }
 }
 
