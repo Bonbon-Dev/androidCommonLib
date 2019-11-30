@@ -1,2 +1,2 @@
-include ':app', ':commonlib', ':oneKeyLogin'
+include ':app', ':commonlib', ':onekeylogin'
 rootProject.name='BbtLib'

@@ -59,12 +59,12 @@ public class OneKeyLogin{
         /**
          * 获取鉴权Token成功
          * */
-        void onGetAuthTokenSuccess(String authToken);
+        void onGetAuthTokenSuccess(String authToken, String type);
 
         /**
          * 获取鉴权Token失败
          * */
-        void onGetAuthTokenFail(String authToken);
+        void onGetAuthTokenFail(String errorMsg);
 
         /**
          * 获取鉴权Token错误
@@ -148,8 +148,9 @@ public class OneKeyLogin{
                                     //成功，根据msgId向服务端请求手机号或进行号码校验，
                                     //请求方法参照《移动token取号接口文档》、《号码校验接口文档》
                                     String msgId = jsonObject.optString("msgId");
+                                    String type = jsonObject.optString("type");
                                     if(callback != null && msgId != null){
-                                        callback.onGetAuthTokenSuccess(msgId);
+                                        callback.onGetAuthTokenSuccess(msgId, type);
                                     }
                                 } else {
                                     //失败，跳转自定义的登录页面
