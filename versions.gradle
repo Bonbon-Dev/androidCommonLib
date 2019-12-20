@@ -1,0 +1,9 @@
+ext.deps = [:]
+def versions = [:]
+versions.appcompat = "1.1.0-rc01"
+
+ext.versions = versions
+
+def support = [:]
+support.app_compat = "androidx.appcompat:appcompat:$versions.appcompat"
+deps.support = support
