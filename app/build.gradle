@@ -26,5 +26,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    implementation "com.bbt.commonlib:commonlib:1.0.0"
+    implementation "com.bbt.common:commonlib:1.0.1"
 }
