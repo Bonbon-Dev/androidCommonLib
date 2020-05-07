@@ -4,7 +4,9 @@ import android.os.Looper;
 
 
 /**
- * Created by wanjian on 2017/2/14.
+ *  @author https://github.com/android-notes/Cockroach/tree/X
+ *  功能描述: 统一异常处理的
+ *  时 间： 2019-11-15 12:58
  */
 public final class Cockroach {
 
