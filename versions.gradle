@@ -1,6 +1,6 @@
 ext.deps = [:]
 def versions = [:]
-versions.appcompat = "1.1.0-rc01"
+versions.appcompat = "1.2.0-beta01"
 
 ext.versions = versions
 
