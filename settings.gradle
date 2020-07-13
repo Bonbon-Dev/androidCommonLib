@@ -1,2 +1,3 @@
+include ':bzpush'
 include ':app', ':commonlib', ':oneKeyLogin'
 rootProject.name='BbtLib'

@@ -29,6 +29,7 @@ allprojects {
             dirs 'libs'
         }
         maven { url 'https://dl.bintray.com/bbt/bbtCommon/' }
+        maven { url 'https://dl.bintray.com/umsdk/release' }
         google()
         jcenter()
     }
