@@ -62,23 +62,6 @@ public final class NetworkUtils {
         return info != null && info.isConnected();
     }
 
-    /**
-     * 判断网络是否可以上网
-     * <p>Must hold {@code <uses-permission android:name="android.permission.INTERNET" />}</p>
-     *
-     * @param callback The callback.
-     * @return the task
-     */
-    @RequiresPermission(INTERNET)
-    public static Utils.Task<Boolean> isAvailableAsync(@NonNull final Utils.Callback<Boolean> callback) {
-        return Utils.doAsync(new Utils.Task<Boolean>(callback) {
-            @RequiresPermission(INTERNET)
-            @Override
-            public Boolean doInBackground() {
-                return isAvailable();
-            }
-        });
-    }
 
     /**
      * Return whether network is available.
