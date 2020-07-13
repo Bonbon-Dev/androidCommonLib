@@ -34,7 +34,7 @@ public final class ConvertUtils {
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
-     * Bytes to bits.
+     * bytes 与 bits 互转 Bytes to bits.
      *
      * @param bytes The bytes.
      * @return bits
@@ -53,7 +53,7 @@ public final class ConvertUtils {
     }
 
     /**
-     * Bits to bytes.
+     * bytes 与 bits 互转 Bits to bytes.
      *
      * @param bits The bits.
      * @return bytes
@@ -118,7 +118,7 @@ public final class ConvertUtils {
     }
 
     /**
-     * Bytes to hex string.
+     * bytes 与 hexString 互转
      * <p>e.g. bytes2HexString(new byte[] { 0, (byte) 0xa8 }) returns "00A8"</p>
      *
      * @param bytes The bytes.
@@ -141,7 +141,7 @@ public final class ConvertUtils {
     }
 
     /**
-     * Hex string to bytes.
+     * bytes 与 hexString 互转 Hex string to bytes.
      * <p>e.g. hexString2Bytes("00A8") returns { 0, (byte) 0xA8 }</p>
      *
      * @param hexString The hex string.
@@ -211,7 +211,7 @@ public final class ConvertUtils {
     }
 
     /**
-     * Size of byte to fit size of memory.
+     * 字节数转合适内存大小
      * <p>to three decimal places</p>
      *
      * @param byteSize Size of byte.

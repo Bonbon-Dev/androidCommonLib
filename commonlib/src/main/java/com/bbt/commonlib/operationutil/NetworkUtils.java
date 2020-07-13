@@ -1,12 +1,15 @@
 package com.bbt.commonlib.operationutil;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -59,23 +62,6 @@ public final class NetworkUtils {
         return info != null && info.isConnected();
     }
 
-    /**
-     * 判断网络是否可以上网
-     * <p>Must hold {@code <uses-permission android:name="android.permission.INTERNET" />}</p>
-     *
-     * @param callback The callback.
-     * @return the task
-     */
-    @RequiresPermission(INTERNET)
-    public static Utils.Task<Boolean> isAvailableAsync(@NonNull final Utils.Callback<Boolean> callback) {
-        return Utils.doAsync(new Utils.Task<Boolean>(callback) {
-            @RequiresPermission(INTERNET)
-            @Override
-            public Boolean doInBackground() {
-                return isAvailable();
-            }
-        });
-    }
 
     /**
      * Return whether network is available.
@@ -260,4 +246,90 @@ public final class NetworkUtils {
         }
         return cm.getActiveNetworkInfo();
     }
+
+    /**
+     * 判断是否可以使用一键登录 可以使用的条件是 上网卡是3大运营商的   没开流量和运营商的不是3大运营商的都不可以用
+     * @return
+     */
+    public static boolean canUseOneKeyLogin(){
+        try {
+            int type=getCellularOperatorType();
+            if(1==type||2==type||3==type){
+                return true;
+            }else{
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /**
+     * 获取使用流量卡的运营商网络类型
+     * @return
+     */
+    public static String getSimOperator() {
+        try {
+            TelephonyManager tm = (TelephonyManager) Utils.getApp().getSystemService(Context.TELEPHONY_SERVICE);
+            if(null!=tm && tm.getSimState() == TelephonyManager.SIM_STATE_READY){
+                return tm.getSimOperator();
+            }else{
+                return "";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
+    }
+    /**
+     * 获取设备蜂窝网络运营商
+     *
+     * @return ["中国电信CTCC":3]["中国联通CUCC:2]["中国移动CMCC":1]["other":0]["无sim卡":-1]["数据流量未打开":-2]
+     */
+    public static int getCellularOperatorType() {
+        int opeType = -1;
+        // Mobile data disabled
+        if (!isMobileDataEnabled()) {
+            opeType = -2;
+            return opeType;
+        }
+        String operator = getSimOperator();
+        // 中国联通
+        if ("46001".equals(operator) || "46006".equals(operator) || "46009".equals(operator)) {
+            opeType = 2;
+            // 中国移动
+        } else if ("46000".equals(operator) || "46002".equals(operator) || "46004".equals(operator) || "46007".equals(operator)) {
+            opeType = 1;
+            // 中国电信
+        } else if ("46003".equals(operator) || "46005".equals(operator) || "46011".equals(operator)) {
+            opeType = 3;
+        } else {
+            opeType = 0;
+        }
+        return opeType;
+    }
+
+    /**
+     * 判断数据流量开关是否打开
+     * @return
+     */
+    public static boolean isMobileDataEnabled() {
+        try {
+            TelephonyManager tm = (TelephonyManager) Utils.getApp().getSystemService(Context.TELEPHONY_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return tm.isDataEnabled();
+            }else{
+                @SuppressLint("DiscouragedPrivateApi")
+                Method method = ConnectivityManager.class.getDeclaredMethod("getMobileDataEnabled");
+                method.setAccessible(true);
+                ConnectivityManager connectivityManager = (ConnectivityManager) Utils.getApp().getSystemService(Context.CONNECTIVITY_SERVICE);
+                return (Boolean) method.invoke(connectivityManager);
+            }
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+
 }

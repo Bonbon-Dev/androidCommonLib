@@ -1,20 +1,27 @@
 package com.bbt.commonlib.operationutil;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
+import com.bbt.commonlib.toolutil.ConvertUtils;
+import com.bbt.commonlib.toolutil.EncryptUtils;
 import com.bbt.commonlib.toolutil.FileUtils;
+import com.bbt.commonlib.toolutil.StringUtil;
 
 import java.io.File;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 
 /**
@@ -29,12 +36,43 @@ public final class AppUtils {
 
 
     /**
+     * 注册 App 前后台切换监听器
+     * @param listener The status of application changed listener
+     */
+    public static void registerAppStatusChangedListener(@NonNull final Utils.OnAppStatusChangedListener listener) {
+        UtilsActivityLifecycleImpl.INSTANCE.addOnAppStatusChangedListener(listener);
+    }
+
+    /**
+     * 注销 App 前后台切换监听器
+     * @param listener The status of application changed listener
+     */
+    public static void unregisterAppStatusChangedListener(@NonNull final Utils.OnAppStatusChangedListener listener) {
+        UtilsActivityLifecycleImpl.INSTANCE.removeOnAppStatusChangedListener(listener);
+    }
+
+    /**
      * 返回当前应用是否在前台
      *
      * @return 在前台为true
      */
     public static boolean isAppForeground() {
-        return Utils.isAppForeground();
+        ActivityManager am = (ActivityManager) Utils.getApp().getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) {
+            return false;
+        }
+        List<ActivityManager.RunningAppProcessInfo> info = am.getRunningAppProcesses();
+        if (info == null || info.size() == 0) {
+            return false;
+        }
+        for (ActivityManager.RunningAppProcessInfo aInfo : info) {
+            if (aInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                if (aInfo.processName.equals(Utils.getApp().getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -42,13 +80,7 @@ public final class AppUtils {
      * 退出应用的 待实验效果看对界面的onDestroy有没影响
      */
     public static void exitApp() {
-        List<Activity> activityList = Utils.getActivityList();
-        // remove from top
-        for (int i = activityList.size() - 1; i >= 0; --i) {
-            Activity activity = activityList.get(i);
-            // sActivityList remove the index activity at onActivityDestroyed
-            activity.finish();
-        }
+        ActivityUtils.finishAllActivities();
         System.exit(0);
     }
 
@@ -111,32 +143,6 @@ public final class AppUtils {
     }
 
 
-    /**
-     * Return the application's user-ID.
-     *
-     * @return the application's signature for MD5 value
-     */
-    public static int getAppUid() {
-        return getAppUid(Utils.getApp().getPackageName());
-    }
-
-    /**
-     * Return the application's user-ID.
-     *
-     * @param pkgName The name of the package.
-     * @return the application's signature for MD5 value
-     */
-    public static int getAppUid(String pkgName) {
-        try {
-            ApplicationInfo ai = Utils.getApp().getPackageManager().getApplicationInfo(pkgName, 0);
-            if (ai != null) {
-                return ai.uid;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
 
     /**
      * 安装 App（支持 8.0）
@@ -180,5 +186,93 @@ public final class AppUtils {
         Utils.getApp().grantUriPermission(Utils.getApp().getPackageName(), data, Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setDataAndType(data, type);
         return isNewTask ? intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) : intent;
+    }
+
+
+    /**
+     * Return the application's signature.
+     *
+     * @param packageName The name of the package.
+     * @return the application's signature
+     */
+    public static Signature[] getAppSignature(final String packageName) {
+        if (StringUtil.isSpace(packageName)) {
+            return null;
+        }
+        try {
+            PackageManager pm = Utils.getApp().getPackageManager();
+            @SuppressLint("PackageManagerGetSignatures")
+            PackageInfo pi = pm.getPackageInfo(packageName, PackageManager.GET_SIGNATURES);
+            return pi == null ? null : pi.signatures;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 获取应用签名的的 SHA1 值
+     *
+     * @return the application's signature for SHA1 value
+     */
+    public static String getAppSignatureSHA1() {
+        return getAppSignatureSHA1(Utils.getApp().getPackageName());
+    }
+
+    /**
+     * 获取应用签名的的 SHA1 值
+     *
+     * @param packageName The name of the package.
+     * @return the application's signature for SHA1 value
+     */
+    public static String getAppSignatureSHA1(final String packageName) {
+        return getAppSignatureHash(packageName, "SHA1");
+    }
+
+    /**
+     * 获取应用签名的的 SHA256 值
+     * @return the application's signature for SHA256 value
+     */
+    public static String getAppSignatureSHA256() {
+        return getAppSignatureSHA256(Utils.getApp().getPackageName());
+    }
+
+    /**
+     * 获取应用签名的的 SHA256 值
+     * @param packageName The name of the package.
+     * @return the application's signature for SHA256 value
+     */
+    public static String getAppSignatureSHA256(final String packageName) {
+        return getAppSignatureHash(packageName, "SHA256");
+    }
+
+    /**
+     * 获取应用签名的的 MD5 值
+     * @return the application's signature for MD5 value
+     */
+    public static String getAppSignatureMD5() {
+        return getAppSignatureMD5(Utils.getApp().getPackageName());
+    }
+
+    /**
+     * Return the application's signature for MD5 value.
+     *
+     * @param packageName The name of the package.
+     * @return the application's signature for MD5 value
+     */
+    public static String getAppSignatureMD5(final String packageName) {
+        return getAppSignatureHash(packageName, "MD5");
+    }
+
+    private static String getAppSignatureHash(final String packageName, final String algorithm) {
+        if (StringUtil.isSpace(packageName)) {
+            return "";
+        }
+        Signature[] signature = getAppSignature(packageName);
+        if (signature == null || signature.length <= 0){
+            return "";
+        }
+        return ConvertUtils.bytes2HexString(EncryptUtils.hashTemplate(signature[0].toByteArray(), algorithm))
+                .replaceAll("(?<=[0-9A-F]{2})[0-9A-F]{2}", ":$0");
     }
 }
