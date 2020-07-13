@@ -3,8 +3,10 @@
     <application
         android:name="com.bbt.commonlib.LibApplication"
         >
+
+        <!--util 工具类相关的-->
         <provider
-            android:name=".operationutil.Utils$FileProvider4UtilCode"
+            android:name=".operationutil.UtilsFileProvider"
             android:authorities="${applicationId}.utilcode.provider"
             android:exported="false"
             android:grantUriPermissions="true"

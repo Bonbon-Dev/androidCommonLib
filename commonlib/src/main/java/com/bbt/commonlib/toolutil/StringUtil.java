@@ -21,6 +21,25 @@ public class StringUtil {
     }
 
     /**
+     * 判断字符串是否为 null 或全为空白字符
+     * @param s The string.
+     * @return {@code true}: yes<br> {@code false}: no
+     */
+    public static boolean isSpace(final String s) {
+        if (s == null) {
+            return true;
+        }
+        for (int i = 0, len = s.length(); i < len; ++i) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+    /**
      * 判断一个String字符串 trim之后 是否为空的
      * @param str
      * @return

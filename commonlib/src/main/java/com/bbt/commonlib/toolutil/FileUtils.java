@@ -447,6 +447,12 @@ public final class FileUtils {
     public static boolean createOrExistsDir(final String dirPath) {
         return createOrExistsDir(getFileByPath(dirPath));
     }
+
+    /**
+     * 判断文件是否存在，不存在则判断是否创建成功
+     * @param file
+     * @return
+     */
     public static boolean createOrExistsDir(final File file) {
         return file != null && (file.exists() ? file.isDirectory() : file.mkdirs());
     }
@@ -481,5 +487,31 @@ public final class FileUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+
+    /**
+     * 获取文件或目录大小
+     * @param filePath The path of file.
+     * @return the size
+     */
+    public static String getSize(final String filePath) {
+        return getSize(getFileByPath(filePath));
+    }
+
+    /**
+     * Return the size.
+     *
+     * @param file The directory.
+     * @return the size
+     */
+    public static String getSize(final File file) {
+        if (file == null) {
+            return "";
+        }
+        if (file.isDirectory()) {
+            return getDirSize(file);
+        }
+        return getFileSize(file);
     }
 }
