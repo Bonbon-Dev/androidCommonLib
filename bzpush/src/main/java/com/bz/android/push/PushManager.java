@@ -24,7 +24,7 @@ public class PushManager {
         static PushManager instance = new PushManager();
     }
 
-    public PushManager getInstance() {
+    public static PushManager getInstance() {
         return PushManagerHolder.instance;
     }
 
@@ -175,7 +175,7 @@ public class PushManager {
         }, tags);
     }
 
-    public static Application getApplicationInner() {
+    private static Application getApplicationInner() {
         try {
             Class<?> activityThread = Class.forName("android.app.ActivityThread");
 
