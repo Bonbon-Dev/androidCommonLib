@@ -66,3 +66,6 @@ dependencies {
     implementation 'com.umeng.umsdk:crash:0.0.4'
 
 }
+
+// 根节点添加上传的
+apply from: "bintrayUpload.gradle"
