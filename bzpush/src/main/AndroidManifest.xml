@@ -25,7 +25,7 @@
         android:supportsRtl="true">
 
         <activity
-            android:name="com.bz.android.push.MipushTestActivity"
+            android:name="com.bz.android.push.SystemPushClickActivity"
             android:exported="true"/>
 
 
@@ -194,21 +194,5 @@
             </intent-filter>
         </receiver>
         <!-- 魅族 end-->
-
-        <!-- VIVO厂商通道 start-->
-        <meta-data
-            android:name="com.vivo.push.api_key"
-            android:value="此处改为VIVO后台真实参数" />
-        <meta-data
-            android:name="com.vivo.push.app_id"
-            android:value="此处改为VIVO后台真实参数" />
-        <!-- VIVO厂商通道 end-->
-
-        <!-- HUAWEI厂商通道 start-->
-        <meta-data
-            android:name="com.huawei.hms.client.appid"
-            android:value="appid=此处改为VIVO后台真实参数" />
-        <!-- HUAWEI厂商通道 end-->
-
     </application>
 </manifest>

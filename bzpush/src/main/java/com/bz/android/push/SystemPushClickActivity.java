@@ -9,9 +9,13 @@ import android.widget.TextView;
 import com.umeng.message.UmengNotifyClickActivity;
 
 import org.android.agoo.common.AgooConstants;
-
-public class MipushTestActivity extends UmengNotifyClickActivity {
-    private static String TAG = MipushTestActivity.class.getName();
+/**
+  *  @author ZhangYi
+  *  功能描述: 配合友盟推送的：国产厂商系统推送的点击处理
+  *  时 间： 2020/7/14 3:50 PM
+  */
+public class SystemPushClickActivity extends UmengNotifyClickActivity {
+    private static String TAG = SystemPushClickActivity.class.getName();
     private TextView mipushTextView;
 
     @Override
