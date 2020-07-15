@@ -1,5 +1,6 @@
 package com.bz.android.push;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
@@ -75,19 +76,43 @@ public class UMPushManager {
     PushMsgClickListener clickListener;
     PushTagResult tagResult;
     PushAliasResult aliasResult;
-    PushAgent pushAgent;
+    PushAgent pushAgent;  //推送SDK管理类
 
+    /**
+     * 启用华为推送
+     * */
     boolean hwEnable;
+
+    /**
+     * 启用VIVO推送
+     * */
     boolean vivoEnable;
+
+    /**
+     * 启用小米推送
+     * */
     boolean miEnable;
     String miPushId;
     String miPushKey;
+
+    /**
+     * 启用魅族推送
+     * */
     boolean mzEnable;
     String mzPushId;
     String mzPushKey;
+
+    /**
+     * 启用OPPO推送
+     * */
     boolean oppoEnable;
     String oppoPushSecret;
     String oppoPushKey;
+
+    /**
+     * 通知声音模式
+     * -1默认不设置
+     * */
     int soundMode = -1;
     /**
      * 启用推送
@@ -97,10 +122,17 @@ public class UMPushManager {
      * 启用Log
      * */
     boolean printLog;
+    /**
+     * 可以设置别名
+     * */
+    boolean canAlias;
 
 
 
 
+    /**
+     * 推送SDK初始化回调
+     * */
     public interface PushInitResult {
         /**
          * 获取deviceToken成功的回调
@@ -113,7 +145,9 @@ public class UMPushManager {
         void getDeviceTokenFailure(@NonNull String errorCode, @NonNull String msg);
     }
 
-
+    /**
+     * 推送SDK中标签管理回调
+     * */
     public interface PushTagResult {
         /**
          * 对设备设置标签的回调(设置标签不依赖deviceToken的获取)
@@ -132,7 +166,9 @@ public class UMPushManager {
     }
 
 
-
+    /**
+     * 推送SDK中别名管理回调
+     * */
     public interface PushAliasResult {
         /**
          * 对deviceToken添加别名的回调(添加别名依赖deviceToken的获取)
@@ -150,16 +186,27 @@ public class UMPushManager {
         void onDelAliasResult(boolean isSuccess, @Nullable String message);
     }
 
-
+    /**
+     * 推送消息点击回调
+     * */
     public interface PushMsgClickListener {
         /**
-         * 获取deviceToken成功的回调
+         * 点击系统推送通知栏消息时的回调
          * */
-        void onClickPushMsg(@NonNull BZPushMsg bzPushMsg);
+        void onClickSystemPushMsg(@NonNull Activity activity, @NonNull String pushMsgBody);
+
+        /**
+         * 点击友盟推送通知栏消息时的回调
+         * */
+        void onClickUMPushMsg(@NonNull Map<String, String> pushMsgExtraList);
     }
 
     /**
      * 初始化推送之前调用
+     * @param enablePush 是否启用推送,为false时 {@link #setPushContextEnv(boolean, boolean, Map)}
+     *                   和{@link #initPush(Application)}方法直接返回，不会做任何处理，推送SDK和服务不会启用
+     * @param printLog 是否打印log，默认TAG为UMPushManager
+     * @param envMap 推送SDK配置参数Map表，map不能为null也不能为空Map，本类中根据map中的值设置推送初始化参数
      * */
     public void setPushContextEnv(boolean enablePush, boolean printLog, @NonNull Map<String, Object> envMap){
         this.enablePush = enablePush;
@@ -223,29 +270,48 @@ public class UMPushManager {
         }
     }
 
+    /**
+     * 设置推送SDK初始化的结果回调
+     * */
     public void setPushInitResult(PushInitResult pushInitResult){
         this.pushInitResult = pushInitResult;
     }
 
+    /**
+     * 设置推送消息点击的回调
+     * */
     public void setPushMsgClickListener(PushMsgClickListener pushMsgClickListener){
         this.clickListener = pushMsgClickListener;
     }
 
+    /**
+     * 给Device_Token设置别名的回调
+     * */
     public void setPushAliasResult(PushAliasResult aliasResult){
         this.aliasResult = aliasResult;
     }
 
+    /**
+     * 给设备设置标签的回调
+     * */
     public void setPushTagResult(PushTagResult tagResult){
         this.tagResult = tagResult;
     }
 
+    /**
+     * 打印log
+     * */
     private void print(String msg) {
         if(enablePush){
             Log.d(TAG, msg);
         }
     }
 
-    public void initPush(Context context) {
+    /**
+     * 初始化推送
+     * @param context 按华为推送的要求需要传入Application对象
+     * */
+    public void initPush(Application context) {
 
         if(!enablePush){
             return;
@@ -260,12 +326,43 @@ public class UMPushManager {
 
         pushAgent.setResourcePackageName("com.bz.android.push");
 
+        //后续动作:点击通知栏消息处理
         UmengNotificationClickHandler notificationClickHandler = new UmengNotificationClickHandler() {
+
+            /**
+             * 方式一：打开应用时回调
+             * */
+            @Override
+            public void launchApp(Context context, UMessage msg) {
+                super.launchApp(context, msg);
+                if(msg.extra != null && msg.extra.size() > 0){
+                    distributePushMsg(false, null, msg.extra, null);
+                }
+            }
+
+            /**
+             * 方式二：打开链接(url)时回调
+             * */
+            @Override
+            public void openUrl(Context context, UMessage uMessage) {
+                super.openUrl(context, uMessage);
+            }
+
+            /**
+             * 方式三：打开指定页面时回调
+             * */
+            @Override
+            public void openActivity(Context context, UMessage uMessage) {
+                super.openActivity(context, uMessage);
+            }
+
+            /**
+             * 方式四：自定义行为时回调
+             * */
             @Override
             public void dealWithCustomAction(Context context, UMessage msg) {
-                //友盟通道的推送
-                distributePushMsg("");
             }
+
         };
 
         pushAgent.setNotificationClickHandler(notificationClickHandler);
@@ -277,6 +374,7 @@ public class UMPushManager {
             public void onSuccess(String deviceToken) {
                 //注册成功会返回deviceToken deviceToken是推送消息的唯一标志
                 print("注册成功：deviceToken：-------->  " + deviceToken);
+                canAlias = true;
                 if(pushInitResult != null){
                     pushInitResult.getDeviceTokenSuccess(deviceToken);
                 }
@@ -285,6 +383,7 @@ public class UMPushManager {
             @Override
             public void onFailure(String s, String s1) {
                 print("注册失败：-------->  " + "s:" + s + ",s1:" + s1);
+                canAlias = false;
                 if(pushInitResult != null){
                     pushInitResult.getDeviceTokenFailure(s, s1);
                 }
@@ -295,10 +394,11 @@ public class UMPushManager {
 
     }
 
-    private void initSystemPush(Context context) {
-        /**
-         * 初始化厂商通道
-         */
+    /**
+     * 初始化厂商通道
+     * @param context 按华为推送的要求需要传入Application对象
+     */
+    private void initSystemPush(Application context) {
         if(miEnable){
             //小米通道
             if(miPushId != null && miPushId.length() > 0 && miPushKey != null && miPushKey.length() > 0){
@@ -310,7 +410,7 @@ public class UMPushManager {
 
         if(hwEnable){
             //华为通道，注意华为通道的初始化参数在minifest中配置
-            HuaWeiRegister.register(getApplicationInner());
+            HuaWeiRegister.register(context);
         }
 
         if(mzEnable){
@@ -337,12 +437,29 @@ public class UMPushManager {
         }
     }
 
-    void distributePushMsg(String msg){
-        if(clickListener!= null){
-            clickListener.onClickPushMsg(new BZPushMsg());
+    /**
+     * 向万物或棒棒糖分发消息
+     * 由于通过系统推送推过来的额外消息的消息体是Object
+     * 由于通过友盟推送推过来的额外消息的消息体是Map
+     * 所以这里做了区分处理，不再进行统一的对外输出
+     * (统一的对外输出会侵入业务，这不是这个库应该做的事情）
+     * @param isFromSystem 消息体来自系统推送通知
+     * @param pushMsgExtraList 友盟推送推过来的额外消息
+     * @param pushMsgBody 系统推送推过来的消息
+     * */
+    void distributePushMsg(boolean isFromSystem, Activity activity, Map<String, String> pushMsgExtraList, String pushMsgBody){
+        if(clickListener != null){
+            if(isFromSystem){
+                clickListener.onClickSystemPushMsg(activity, pushMsgBody);
+            } else {
+                clickListener.onClickUMPushMsg(pushMsgExtraList);
+            }
         }
     }
 
+    /**
+     * 给设备设置推送标签
+     * */
     public void addTag(String... tags){
         //添加标签 示例：将“标签1”、“标签2”绑定至该设备
         pushAgent.getTagManager().addTags(new TagManager.TCallBack() {
@@ -355,6 +472,9 @@ public class UMPushManager {
         }, tags);
     }
 
+    /**
+     * 删除设备的推送标签
+     * */
     public void delTag(String... tags){
         //删除标签,将之前添加的标签中的一个或多个删除
         pushAgent.getTagManager().deleteTags(new TagManager.TCallBack() {
@@ -367,6 +487,9 @@ public class UMPushManager {
         }, tags);
     }
 
+    /**
+     * 获取设备的推送标签
+     * */
     public void getTag(){
         //获取服务器端的所有标签
         pushAgent.getTagManager().getTags(new TagManager.TagListCallBack() {
@@ -389,7 +512,7 @@ public class UMPushManager {
      * 参考：https://developer.umeng.com/docs/66632/detail/89996
      * **/
     public void addAlias(String aliasId, String aliasType){
-        if(aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
+        if(canAlias && aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
             pushAgent.addAlias(aliasId, aliasType, new UTrack.ICallBack() {
                 @Override
                 public void onMessage(boolean isSuccess, String message) {
@@ -411,7 +534,7 @@ public class UMPushManager {
      * 参考：https://developer.umeng.com/docs/66632/detail/89996
      * **/
     public void bindAlias(String aliasId, String aliasType){
-        if(aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
+        if(canAlias && aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
             pushAgent.setAlias(aliasId, aliasType, new UTrack.ICallBack() {
                 @Override
                 public void onMessage(boolean isSuccess, String message) {
@@ -441,23 +564,6 @@ public class UMPushManager {
                     }
                 }
             });
-        }
-    }
-
-    private static Application getApplicationInner() {
-        try {
-            Class<?> activityThread = Class.forName("android.app.ActivityThread");
-
-            Method currentApplication = activityThread.getDeclaredMethod("currentApplication");
-            Method currentActivityThread = activityThread.getDeclaredMethod("currentActivityThread");
-
-            Object current = currentActivityThread.invoke((Object)null);
-            Object app = currentApplication.invoke(current);
-
-            return (Application)app;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }
