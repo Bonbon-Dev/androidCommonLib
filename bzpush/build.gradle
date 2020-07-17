@@ -56,6 +56,7 @@ dependencies {
 
     //基础组件库依赖(必须)
     api 'com.umeng.umsdk:common:9.1.0'
+    api 'com.umeng.umsdk:asms:1.1.3' // asms包依赖(必选)
     //implementation 'com.umeng.umsdk:utdid:1.5.2'
 
     //友盟push相关依赖(必须)

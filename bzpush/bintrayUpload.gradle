@@ -2,7 +2,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 // This is the library version used when deploying the artifact
 //这里是你的版本，当你需要上传新的版本到bintry上时，只需要修改这里的版本即可
-version = "1.0.0"
+version = "1.1.0"
 
 
 //项目的主页

@@ -37,7 +37,7 @@ public class SystemPushClickActivity extends UmengNotifyClickActivity {
                 //经验来自于小程序，可参考项目工程中 WXEntryActivity中的注释说明
                 //如果经证实没有问题，可使用普通 finish()方法关闭页面
                 finishAndRemoveTask();
-                UMPushManager.getInstance().distributePushMsg(true, SystemPushClickActivity.this, null, pushMsgBody);
+                UMPushManager.getInstance().distributeNotificationMsg(true, null, pushMsgBody);
             }
         });
     }

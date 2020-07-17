@@ -1,6 +1,5 @@
 package com.bz.android.push;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
@@ -11,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.PushAgent;
 import com.umeng.message.UTrack;
+import com.umeng.message.UmengMessageHandler;
 import com.umeng.message.UmengNotificationClickHandler;
 import com.umeng.message.common.inter.ITagManager;
 import com.umeng.message.entity.UMessage;
@@ -22,7 +22,6 @@ import org.android.agoo.oppo.OppoRegister;
 import org.android.agoo.vivo.VivoRegister;
 import org.android.agoo.xiaomi.MiPushRegistar;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -73,7 +72,7 @@ public class UMPushManager {
 
 
     PushInitResult pushInitResult;
-    PushMsgClickListener clickListener;
+    PushMsgListener msgListener;
     PushTagResult tagResult;
     PushAliasResult aliasResult;
     PushAgent pushAgent;  //推送SDK管理类
@@ -189,16 +188,21 @@ public class UMPushManager {
     /**
      * 推送消息点击回调
      * */
-    public interface PushMsgClickListener {
+    public interface PushMsgListener {
         /**
          * 点击系统推送通知栏消息时的回调
          * */
-        void onClickSystemPushMsg(@NonNull Activity activity, @NonNull String pushMsgBody);
+        void onClickSystemNotificationMsg(@NonNull String pushMsgBody);
 
         /**
          * 点击友盟推送通知栏消息时的回调
          * */
-        void onClickUMPushMsg(@NonNull Map<String, String> pushMsgExtraList);
+        void onClickUMNotificationMsg(@Nullable Map<String, String> pushMsgExtraList);
+
+        /**
+         * 收到友盟透传消息时的回调
+         * */
+        void onGetUMPenetrateMsg(@Nullable String penetrateMsgJson);
     }
 
     /**
@@ -280,8 +284,8 @@ public class UMPushManager {
     /**
      * 设置推送消息点击的回调
      * */
-    public void setPushMsgClickListener(PushMsgClickListener pushMsgClickListener){
-        this.clickListener = pushMsgClickListener;
+    public void setPushMsgListener(PushMsgListener pushMsgListener){
+        this.msgListener = pushMsgListener;
     }
 
     /**
@@ -335,9 +339,7 @@ public class UMPushManager {
             @Override
             public void launchApp(Context context, UMessage msg) {
                 super.launchApp(context, msg);
-                if(msg.extra != null && msg.extra.size() > 0){
-                    distributePushMsg(false, null, msg.extra, null);
-                }
+                distributeNotificationMsg(false, msg.extra, null);
             }
 
             /**
@@ -364,6 +366,16 @@ public class UMPushManager {
             }
 
         };
+
+        //后续动作:透传消息处理
+        UmengMessageHandler messageHandler = new UmengMessageHandler(){
+            @Override
+            public void dealWithCustomMessage(final Context context, final UMessage msg) {
+                distributePenetrateMsg(msg.custom);
+            }
+        };
+
+        pushAgent.setMessageHandler(messageHandler);
 
         pushAgent.setNotificationClickHandler(notificationClickHandler);
 
@@ -447,13 +459,19 @@ public class UMPushManager {
      * @param pushMsgExtraList 友盟推送推过来的额外消息
      * @param pushMsgBody 系统推送推过来的消息
      * */
-    void distributePushMsg(boolean isFromSystem, Activity activity, Map<String, String> pushMsgExtraList, String pushMsgBody){
-        if(clickListener != null){
+    void distributeNotificationMsg(boolean isFromSystem, Map<String, String> pushMsgExtraList, String pushMsgBody){
+        if(msgListener != null){
             if(isFromSystem){
-                clickListener.onClickSystemPushMsg(activity, pushMsgBody);
+                msgListener.onClickSystemNotificationMsg(pushMsgBody);
             } else {
-                clickListener.onClickUMPushMsg(pushMsgExtraList);
+                msgListener.onClickUMNotificationMsg(pushMsgExtraList);
             }
+        }
+    }
+
+    void distributePenetrateMsg(String penetrateMsgJson){
+        if(msgListener != null){
+            msgListener.onGetUMPenetrateMsg(penetrateMsgJson);
         }
     }
 
@@ -512,7 +530,7 @@ public class UMPushManager {
      * 参考：https://developer.umeng.com/docs/66632/detail/89996
      * **/
     public void addAlias(String aliasId, String aliasType){
-        if(canAlias && aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
+        if(aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
             pushAgent.addAlias(aliasId, aliasType, new UTrack.ICallBack() {
                 @Override
                 public void onMessage(boolean isSuccess, String message) {
@@ -534,7 +552,7 @@ public class UMPushManager {
      * 参考：https://developer.umeng.com/docs/66632/detail/89996
      * **/
     public void bindAlias(String aliasId, String aliasType){
-        if(canAlias && aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
+        if(aliasId != null && aliasId.length() > 0 && aliasType != null && aliasType.length() > 0){
             pushAgent.setAlias(aliasId, aliasType, new UTrack.ICallBack() {
                 @Override
                 public void onMessage(boolean isSuccess, String message) {
@@ -565,5 +583,9 @@ public class UMPushManager {
                 }
             });
         }
+    }
+
+    public void setAppStart(Context context){
+        PushAgent.getInstance(context).onAppStart();
     }
 }

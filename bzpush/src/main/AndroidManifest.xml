@@ -26,6 +26,7 @@
 
         <activity
             android:name="com.bz.android.push.SystemPushClickActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:exported="true"/>
 
 
