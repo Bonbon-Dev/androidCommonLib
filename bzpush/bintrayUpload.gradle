@@ -1,25 +1,71 @@
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-// This is the library version used when deploying the artifact
-//这里是你的版本，当你需要上传新的版本到bintry上时，只需要修改这里的版本即可
-version = "1.1.0"
 
 
 //项目的主页
 def siteUrl = 'https://github.com/Bonbon-Dev/androidCommonLib'
 //Git仓库的url
 def gitUrl = 'https://github.com/Bonbon-Dev/androidCommonLib.git'
+
+
+//读取本地的一些属性 目前只把用户和上传key 放到本地属性值了
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+
+//project
+//仓库名称，就是在bintray官网建立的仓库的名称
+def projectRepositoryName = "bbtCommon"
+//项目名
+def projectName = "bzpush-nohuawei"
+//项目组id
+def projectGroupId = "com.bbt.common"
+//项目id,一般同project.name
+def projectArtifactId = "bzpush-nohuawei"
+//项目版本号
+def projectVersionName = "1.1.0"
+//打包类型
+def projectPackaging = 'aar'
+//项目官方网站地址
+def projectSiteUrl = siteUrl
+//项目git地址
+def projectGitUrl = gitUrl
+
+
+//配置开发者信息
+//昵称
+def developerId = 'bbt'
+//姓名
+def developerName = 'bbt'
+//邮箱
+def developerEmail = 'lixiaonan1001@gmail.com'
+
+//配置bintray账号相关信息
+//bintray用户名,不是登陆邮箱,是个人中心右上角显示的名字
+def bintrayUser = properties.getProperty("bintray.user")
+//bintray的ApiKey
+def bintrayApikey = properties.getProperty("bintray.apikey")
+//bintray的Organization Id
+def bintrayOrganizationId = "bbt"
+
+
 // Maven Group ID for the artifact，一般填你唯一的包名
-group = "com.bbt.common"
+group = projectGroupId
+// This is the library version used when deploying the artifact
+//这里是你的版本，当你需要上传新的版本到bintry上时，只需要修改这里的版本即可
+version = projectVersionName
+
+
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
             project {
-                packaging 'aar'
+                packaging projectPackaging
                 //描述
-                name 'bbt通用的推送库'
+                name projectName
                 url siteUrl
+                artifactId projectArtifactId
                 // Set your license
                 licenses {
                     license {
@@ -30,9 +76,9 @@ install {
                 developers {
                     developer {
                         //填写的一些基本信息（也可以不填）
-                        id 'bbt'
-                        name = 'bbt'
-                        email =  'lixiaonan1001@gmail.com'
+                        id developerId
+                        name = developerName
+                        email =  developerEmail
                     }
                 }
                 scm {
@@ -60,16 +106,14 @@ artifacts {
     //archives javadocJar
     archives sourcesJar
 }
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = bintrayUser
+    key = bintrayApikey
     configurations = ['archives']
     pkg {
-        userOrg ="bbt"//这个地方一定要填，一定要填 ！！（这里需要修改你申请账号是的组织id）
-        repo = "bbtCommon"//发布到bintray上的仓库名
-        name = "bzpush"  //发布到bintray上的包名
+        userOrg = bintrayOrganizationId//这个地方一定要填，一定要填 ！！（这里需要修改你申请账号是的组织id）
+        repo = projectRepositoryName//发布到bintray上的仓库名
+        name = projectName  //发布到bintray上的包名
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
